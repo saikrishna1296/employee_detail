@@ -2,10 +2,10 @@ version: 0.2
 
 env:
   variables:
-    ECR_REPOSITORY: "akash"                 # Your ECR repository name
-    AWS_ACCOUNT_ID: "381492133980"           # Your AWS Account ID
-    AWS_REGION: "us-east-1"                  # Your AWS region
-    IMAGE_TAG: "latest"                      # Docker image tag
+    ECR_REPOSITORY: "akash"                     # Your ECR repository name
+    AWS_ACCOUNT_ID: "381492133980"              # Your AWS Account ID
+    AWS_REGION: "us-east-1"                     # Your AWS region
+    IMAGE_TAG: "latest"                         # Docker image tag
     REPO_URI: "381492133980.dkr.ecr.us-east-1.amazonaws.com/akash"  # Full ECR repo URI
 
 phases:
