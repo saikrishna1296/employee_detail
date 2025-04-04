@@ -42,6 +42,17 @@ phases:
       - echo "Pushing Docker image to ECR..."
       - docker push $REPO_URI:$IMAGE_TAG
 
+  post_build:
+    commands:
+      - echo "Build completed on $(date)"
+      - echo "Writing image definitions file..."
+      - printf '[{"name":"employeecd:1","imageUri":"%s"}]' "$REPO_URI:$IMAGE_TAG" > imagedefinitions.json
+      - cat imagedefinitions.json
+
+artifacts:
+  files:
+    - imagedefinitions.json  # Include the image definitions file for deployment      
+
 artifacts:
   files:
     - imagedefinition.json
