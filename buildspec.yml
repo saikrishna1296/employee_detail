@@ -12,27 +12,31 @@ phases:
   install:
     runtime-versions:
       java: corretto17  # Ensure Java 17 is available
+      docker: 20  # Specify Docker version
     commands:
-      - echo "Installing Docker..."
-      - yum install -y docker  # Install Docker
+      - echo "Starting the Docker service..."
+      - service docker start
       - docker --version  # Verify Docker installation
+      - echo "Installing Maven..."
+      - yum install -y maven  # Install Maven
+      - mvn -version  # Verify Maven installation
 
   pre_build:
     commands:
-      - echo "Retrieving authentication token for ECR..."
+      - echo "Logging in to Amazon ECR..."
       - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $REPO_URI
       - echo "ECR login successful."
 
   build:
     commands:
+      - echo "Building the project with Maven..."
+      - mvn clean package -DskipTests  # Build the application without running tests
       - echo "Building Docker image..."
-      - docker build -t employee_detail .  # Build the Docker image
+      - docker build -t employee_details .  # Build the Docker image
       - echo "Tagging Docker image for ECR..."
-      - docker tag employee_detail:latest $REPO_URI:$IMAGE_TAG
+      - docker tag employee_details:latest $REPO_URI:$IMAGE_TAG
       - echo "Pushing Docker image to ECR..."
       - docker push $REPO_URI:$IMAGE_TAG  # Push image to ECR
-
-  
 
 artifacts:
   files:
@@ -40,4 +44,4 @@ artifacts:
 
 cache:
   paths:
-    - "~/.m2/**/*"  # Cache Maven dependencies to speed up builds
+    - "/root/.m2/**/*"  # Cache Maven dependencies to speed up builds
