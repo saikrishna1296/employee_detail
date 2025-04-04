@@ -12,10 +12,11 @@ phases:
   install:
     runtime-versions:
       java: corretto17  # Ensure Java 17 is available
-      docker: 20  # Specify Docker version
     commands:
+      - echo "Installing Docker..."
+      - yum install -y docker  # Install Docker
       - echo "Starting the Docker service..."
-      - service docker start
+      - service docker start  # Start Docker
       - docker --version  # Verify Docker installation
       - echo "Installing Maven..."
       - yum install -y maven  # Install Maven
