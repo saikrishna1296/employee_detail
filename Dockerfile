@@ -19,10 +19,10 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 # Copy the JAR file from the build stage
-COPY --from=build /app/target/employee_details-0.0.1-SNAPSHOT.jar employee_details-0.0.1-SNAPSHOT.jar
+COPY --from=build target/*.jar employee_details-0.0.1-SNAPSHOT.jar
 
 # Expose the port your Spring Boot application runs on
 EXPOSE 8080
 
 # Run the JAR file
-ENTRYPOINT ["java", "-jar", "/app/employee_details-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["java", "-jar", "target/employee_details-0.0.1-SNAPSHOT.jar"]
