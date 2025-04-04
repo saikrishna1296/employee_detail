@@ -1,14 +1,28 @@
-# Use a base image with Java installed
-FROM openjdk:17-jdk-slim as build
+# Stage 1: Build the application
+FROM maven:3.9.4-eclipse-temurin-17 AS build
 
-# Set the working directory in the container
+# Set the working directory
 WORKDIR /app
 
-# Copy the JAR file into the container
-COPY target/employye_details-0.0.1-SNAPSHOT.jar employye_details-0.0.1-SNAPSHOT.jar
+# Copy the pom.xml and download dependencies
+COPY pom.xml .
+RUN mvn dependency:go-offline
+
+# Copy the source code and build the application
+COPY src ./src
+RUN mvn clean package -DskipTests
+
+# Stage 2: Run the application
+FROM openjdk:17-jdk-slim
+
+# Set the working directory
+WORKDIR /app
+
+# Copy the JAR file from the build stage
+COPY --from=build /app/target/employee_details-0.0.1-SNAPSHOT.jar employee_details-0.0.1-SNAPSHOT.jar
 
 # Expose the port your Spring Boot application runs on
 EXPOSE 8080
 
 # Run the JAR file
-ENTRYPOINT ["java", "-jar", "/app/employye_details-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["java", "-jar", "/app/employee_details-0.0.1-SNAPSHOT.jar"]
