@@ -7,6 +7,7 @@ env:
     AWS_REGION: "us-east-1"
     IMAGE_TAG: "latest"
     REPO_URI: "381492133980.dkr.ecr.us-east-1.amazonaws.com/akash"
+    TASK_DEF_NAME: "EMPLOYEECICDT1"
 
 phases:
   install:
@@ -16,7 +17,7 @@ phases:
       - echo "Installing Docker..."
       - yum install -y docker
       - echo "Starting Docker daemon..."
-      - nohup dockerd & 
+      - nohup dockerd &
       - timeout 15 sh -c "until docker info; do echo 'Waiting for Docker to start...'; sleep 1; done"
       - docker --version
       - echo "Installing Maven..."
@@ -45,17 +46,16 @@ phases:
   post_build:
     commands:
       - echo "Build completed on $(date)"
+      - echo "Fetching container name from ECS task definition..."
+      - CONTAINER_NAME=$(aws ecs describe-task-definition --task-definition $TASK_DEF_NAME --region $AWS_REGION --query 'taskDefinition.containerDefinitions[0].name' --output text)
+      - echo "Container name is $CONTAINER_NAME"
       - echo "Writing image definitions file..."
-      - printf '[{"name":"Employee_detail1","imageUri":"%s"}]' "$REPO_URI:$IMAGE_TAG" > imagedefinitions.json
+      - printf '[{"name":"%s","imageUri":"%s"}]' "$CONTAINER_NAME" "$REPO_URI:$IMAGE_TAG" > imagedefinitions.json
       - cat imagedefinitions.json
 
 artifacts:
   files:
-    - imagedefinitions.json  # Include the image definitions file for deployment      
-
-artifacts:
-  files:
-    - imagedefinition.json
+    - imagedefinitions.json
 
 cache:
   paths:
