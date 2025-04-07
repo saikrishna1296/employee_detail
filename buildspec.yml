@@ -46,7 +46,7 @@ phases:
     commands:
       - echo "Build completed on $(date)"
       - echo "Writing image definitions file..."
-      - printf '[{"name":"Employee_detail","imageUri":"%s"}]' "$REPO_URI:$IMAGE_TAG" > imagedefinitions.json
+      - printf '[{"name":"Employee_detail1","imageUri":"%s"}]' "$REPO_URI:$IMAGE_TAG" > imagedefinitions.json
       - cat imagedefinitions.json
 
 artifacts:
