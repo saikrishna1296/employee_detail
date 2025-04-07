@@ -25,16 +25,28 @@ public class EmployeeController {
 		this.employeeService=employeeService;
 	}
 	
+//	@PostMapping("/create")
+//	public ResponseEntity<?> createEmployee(@RequestBody EmployeeDetails employeeDetails){
+//		try {
+//		employeeService.createEmployee(employeeDetails);
+//		return ResponseEntity.status(HttpStatus.OK).body("Employee created Sucessfully");
+//		}catch(SsnAlreadyExistsException e){
+//			 return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+//		}
+//	}
+
+
 	@PostMapping("/create")
-	public ResponseEntity<?> createEmployee(@RequestBody EmployeeDetails employeeDetails){
+	public ResponseEntity<?> createEmployees(@RequestBody List<EmployeeDetails> employees) {
 		try {
-		employeeService.createEmployee(employeeDetails);
-		return ResponseEntity.status(HttpStatus.OK).body("Employee created Sucessfully");
+			List<EmployeeDetails> savedEmployees = employeeService.createMultipleEmployees(employees);
+			return ResponseEntity.status(HttpStatus.OK).body("Employee created Sucessfully");
 		}catch(SsnAlreadyExistsException e){
 			 return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
 		}
 	}
-	
+
+
 	@PutMapping("/update/{id}")
 	public ResponseEntity<?> updateEmployee(@PathVariable int id,@RequestBody EmployeeDetails employeeDetails){
 		try {
@@ -45,13 +57,31 @@ public class EmployeeController {
 			 return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
 		}
 	}
-	
+
+	@GetMapping("/details/ssn/{ssn}")
+	public ResponseEntity<?> getEmployeeBySsn(@PathVariable String ssn) {
+		EmployeeDetails employee = employeeService.getEmployeeBySsn(ssn);
+		if (employee != null) {
+			return ResponseEntity.ok(employee);
+		} else {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Employee with SSN not found");
+		}
+	}
+
 	@DeleteMapping("/delete/{id}")
 	public ResponseEntity<String> deleteEmployee(@PathVariable int id) {
 		employeeService.deleteEmployee(id);
 		return ResponseEntity.status(HttpStatus.OK).body("Employee deleted Sucessfully");
 	}
-	
+
+
+	@DeleteMapping("/delete-multiple")
+	public ResponseEntity<String> deleteMultipleEmployees(@RequestBody List<Integer> ids) {
+		employeeService.deleteMultipleEmployees(ids);
+		return ResponseEntity.status(HttpStatus.OK).body("Employee deleted Sucessfully");
+	}
+
+
 	@GetMapping("/details/{id}")
 	public  EmployeeDetails getEmployeeById(@PathVariable int id) {
 		return employeeService.getEmployeeDetails(id);

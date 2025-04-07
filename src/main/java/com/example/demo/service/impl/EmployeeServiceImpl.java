@@ -1,5 +1,6 @@
 package com.example.demo.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,13 +22,31 @@ public class EmployeeServiceImpl implements EmployeeService  {
 		this.employeeDetailsRepo=employeeDetailsRepo;
 	}
 
-	public EmployeeDetails createEmployee(EmployeeDetails employeeDetails) {
-		 if (employeeDetailsRepo.existsBySsn(employeeDetails.getSsn())) {
-	            throw new SsnAlreadyExistsException("Employee with SSN already exists");
-	        }
-		return employeeDetailsRepo.save(employeeDetails);
+//	public EmployeeDetails createEmployee(EmployeeDetails employeeDetails) {
+//		 if (employeeDetailsRepo.existsBySsn(employeeDetails.getSsn())) {
+//	            throw new SsnAlreadyExistsException("Employee with SSN already exists");
+//	        }
+//		return employeeDetailsRepo.save(employeeDetails);
+//	}
+
+	@Override
+	public List<EmployeeDetails> createMultipleEmployees(List<EmployeeDetails> employees) {
+		List<EmployeeDetails> toBeSaved = new ArrayList<>();
+
+		for (EmployeeDetails emp : employees) {
+			if (!employeeDetailsRepo.existsBySsn(emp.getSsn())) {
+				toBeSaved.add(emp);
+			}
+		}
+
+		return employeeDetailsRepo.saveAll(toBeSaved);
 	}
-	
+
+	public EmployeeDetails getEmployeeBySsn(String ssn) {
+		return employeeDetailsRepo.findBySsn(ssn);
+	}
+
+
 	public EmployeeDetails updateEmploye(EmployeeDetails employeeDetails) {
 		if (employeeDetailsRepo.findById(employeeDetails.getId()).isEmpty()) {
             throw new EmployeeDoesNotExistsException("Employee with employeeId does not exists");
@@ -40,6 +59,11 @@ public class EmployeeServiceImpl implements EmployeeService  {
             throw new EmployeeDoesNotExistsException("Employee with employeeId does not exists");
         }
 		employeeDetailsRepo.deleteById(id);
+	}
+
+	@Override
+	public void deleteMultipleEmployees(List<Integer> ids) {
+		employeeDetailsRepo.deleteAllById(ids);
 	}
 	
 	public EmployeeDetails getEmployeeDetails(int id) {
